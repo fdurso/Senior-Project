@@ -13,7 +13,7 @@
 
 int counter = 0;
 
-//defining struct to hold data that is being transmitted
+//defining struct to format data easily
 typedef struct
 {
   float temperature;
