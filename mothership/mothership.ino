@@ -11,6 +11,14 @@
 #define rst 14
 #define dio0 2
 
+//defining struct to format data easily
+typedef struct
+{
+  float temperature;
+  float humidity;
+  int pressure;
+} data_package;
+
 void setup() {
   //initialize Serial Monitor
   Serial.begin(115200);
@@ -40,16 +48,17 @@ void loop() {
   int packetSize = LoRa.parsePacket();
   if (packetSize) {
     // received a packet
-    Serial.print("Received packet '");
+    Serial.print("Received packet of length ");
+    Serial.println(packetSize);
 
     // read packet
     while (LoRa.available()) {
       String LoRaData = LoRa.readString();
-      Serial.print(LoRaData); 
+      Serial.println(LoRaData); 
     }
 
     // print RSSI of packet
-    Serial.print("' with RSSI ");
+    Serial.print(" with RSSI ");
     Serial.println(LoRa.packetRssi());
   }
 }

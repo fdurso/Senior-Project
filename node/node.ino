@@ -53,22 +53,10 @@ void loop() {
 
   //read measurements from instrumentation and record in data_package object
 
-  //debugging
-
   
   //Send LoRa packet to receiver
   LoRa.beginPacket();
-  /*
-  LoRa.print("\nData Package #");
-  LoRa.print(counter);
-  LoRa.print("Pressure: ");
-  LoRa.print(test.pressure);
-  */
-
-  LoRa.write(test.temperature);
-  LoRa.write(test.humidity);
-  LoRa.write(test.pressure);
-
+  LoRa.printf("{%f, %f, %i}", test.temperature, test.humidity, test.pressure);
   LoRa.endPacket();
 
   counter++;
