@@ -5,13 +5,21 @@
 
 #include <SPI.h>
 #include <LoRa.h>
+
+// Sensor Libraries
 #include <Adafruit_BMP085.h>
+#include "DHT.h"
 
 //define the pins used by the transceiver module
 #define ss 5
 #define rst 14
 #define dio0 2
-//BMP085 Sensor is occupying pins 22 and 21 for i2c clock and data
+
+//define pin used by the DHT11 temp/humidity sensor and a constant for the board type
+#define DHTPIN 4
+#define DHTTYPE DHT11
+
+//BMP085 Sensor is occupying pins 22 and 21 for i2c clock and data, this is assumed by the library
 
 int counter = 0;
 
@@ -23,9 +31,11 @@ typedef struct
   int pressure;
 } data_package;
 
-data_package test = {4.2, 6.9, 2100};
+data_package test;
 
+//Initialize sensor objects
 Adafruit_BMP085 bmp;
+DHT dht(DHTPIN, DHTTYPE);
 
 void setup() {
   //initialize Serial Monitor
@@ -50,11 +60,14 @@ void setup() {
   LoRa.setSyncWord(0xF3);
   Serial.println("LoRa Initializing OK!");
 
-  //setup BMP085 sensor
+  //Initialize BMP085 sensor
   if (!bmp.begin()) {
   Serial.println("Could not find a valid BMP085 sensor, check wiring!");
   while (1) {}
   }
+
+  //Initialize DHT11 sensor
+  dht.begin();
 }
 
 void loop() {
@@ -62,8 +75,9 @@ void loop() {
   Serial.println(counter);
 
   //read measurements from instrumentation and record in data_package object
-  test.temperature = bmp.readTemperature();
+  test.temperature = (bmp.readTemperature() + dht.readTemperature()) / 2;
   test.pressure = bmp.readPressure();
+  test.humidity = dht.readHumidity();
   
   //Send LoRa packet to receiver
   LoRa.beginPacket();
@@ -72,5 +86,5 @@ void loop() {
 
   counter++;
 
-  delay(1000);
+  delay(2000);
 }
