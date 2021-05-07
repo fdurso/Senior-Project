@@ -5,11 +5,13 @@
 
 #include <SPI.h>
 #include <LoRa.h>
+#include <Adafruit_BMP085.h>
 
 //define the pins used by the transceiver module
 #define ss 5
 #define rst 14
 #define dio0 2
+//BMP085 Sensor is occupying pins 22 and 21 for i2c clock and data
 
 int counter = 0;
 
@@ -22,6 +24,8 @@ typedef struct
 } data_package;
 
 data_package test = {4.2, 6.9, 2100};
+
+Adafruit_BMP085 bmp;
 
 void setup() {
   //initialize Serial Monitor
@@ -45,6 +49,12 @@ void setup() {
   // ranges from 0-0xFF
   LoRa.setSyncWord(0xF3);
   Serial.println("LoRa Initializing OK!");
+
+  //setup BMP085 sensor
+  if (!bmp.begin()) {
+  Serial.println("Could not find a valid BMP085 sensor, check wiring!");
+  while (1) {}
+  }
 }
 
 void loop() {
@@ -52,7 +62,8 @@ void loop() {
   Serial.println(counter);
 
   //read measurements from instrumentation and record in data_package object
-
+  test.temperature = bmp.readTemperature();
+  test.pressure = bmp.readPressure();
   
   //Send LoRa packet to receiver
   LoRa.beginPacket();
