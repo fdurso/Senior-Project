@@ -5,6 +5,7 @@
 
 #include <SPI.h>
 #include <LoRa.h>
+#include "WiFi.h"
 
 //define the pins used by the transceiver module
 #define ss 5
@@ -25,18 +26,49 @@ void setup() {
   while (!Serial);
   Serial.println("LoRa Receiver");
 
-  //setup LoRa transceiver module
+//=====================================================
+// WIFI SETUP
+//=====================================================
+
+  //Init WiFi as Station, start SmartConfig
+  WiFi.mode(WIFI_AP_STA);
+  WiFi.beginSmartConfig();
+
+  //Wait for SmartConfig packet from mobile
+  Serial.println("Waiting for SmartConfig.");
+  while (!WiFi.smartConfigDone()) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("");
+  Serial.println("SmartConfig received.");
+
+  //Wait for WiFi to connect to AP
+  Serial.println("Waiting for WiFi");
+  while (WiFi.status() != WL_CONNECTED) {
+    delay(500);
+    Serial.print(".");
+  }
+
+  Serial.println("WiFi Connected.");
+
+  Serial.print("IP Address: ");
+  Serial.println(WiFi.localIP());
+
+//=====================================================
+// LoRa SETUP
+//=====================================================
+
   LoRa.setPins(ss, rst, dio0);
   
-  //replace the LoRa.begin(---E-) argument with your location's frequency 
-  //433E6 for Asia
-  //866E6 for Europe
   //915E6 for North America
   while (!LoRa.begin(915E6)) {
     Serial.println(".");
     delay(500);
   }
-   // Change sync word (0xF3) to match the receiver
+  
+  // Change sync word (0xF3) to match the receiver
   // The sync word assures you don't get LoRa messages from other LoRa transceivers
   // ranges from 0-0xFF
   LoRa.setSyncWord(0xF3);
