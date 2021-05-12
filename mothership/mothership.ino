@@ -12,6 +12,8 @@
 #define rst 14
 #define dio0 2
 
+#define DATA_RECEPTACLE https://fdurso.me/hopkinton_atmo_data/submit.php
+
 //defining struct to format data easily
 typedef struct
 {
@@ -75,6 +77,16 @@ void setup() {
   Serial.println("LoRa Initializing OK!");
 }
 
+void sendData(String data_string)
+{
+  if (WiFi.status())
+    {
+      HTTPClient http;
+
+      http.begin(DATA_RECEPTACLE)
+    }
+}
+
 void loop() {
   // try to parse packet
   int packetSize = LoRa.parsePacket();
@@ -92,5 +104,8 @@ void loop() {
     // print RSSI of packet
     Serial.print(" with RSSI ");
     Serial.println(LoRa.packetRssi());
+
+    //send data to be parsed and sent off
+    sendData(LoRaData);
   }
 }
