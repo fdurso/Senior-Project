@@ -3,7 +3,7 @@
   More resources: https://randomnerdtutorials.com
 *********/
 
-#define NODE_ID 1
+#define NODE_ID "NODE_0"
 
 #include <SPI.h>
 #include <LoRa.h>
@@ -34,6 +34,7 @@ typedef struct
 } data_package;
 
 data_package test;
+String json = "";
 
 //Initialize sensor objects
 Adafruit_BMP085 bmp;
@@ -81,10 +82,10 @@ void loop() {
   //Send LoRa packet to receiver
   LoRa.beginPacket();
   //sending pre-parsed json hurts me but I don't have tiome to do it properly
-  LoRa.printf("{\"temperature\":\"%f\", \"humidity\":\"%f\", \"pressure\":\"%i\", \"nodeID\":\"%s\"}", test.temperature, test.humidity, test.pressure, NODE_ID);
+  LoRa.printf("{\"temperature\" : \"%f\", \"humidity\" : \"%f\", \"pressure\" : \"%i\", \"nodeID\" : \"%s\" }", test.temperature, test.humidity, test.pressure, NODE_ID);
   LoRa.endPacket();
 
   counter++;
 
-  delay(2000);
+  delay(30000);
 }
