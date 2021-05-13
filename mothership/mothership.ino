@@ -5,6 +5,7 @@
 
 #include <SPI.h>
 #include <LoRa.h>
+#include <HTTPClient.h>
 #include "WiFi.h"
 
 //define the pins used by the transceiver module
@@ -12,7 +13,7 @@
 #define rst 14
 #define dio0 2
 
-#define DATA_RECEPTACLE https://fdurso.me/hopkinton_atmo_data/submit.php
+#define DATA_RECEPTACLE "https://fdurso.me/hopkinton_atmo_data/submit.php"
 
 //defining struct to format data easily
 typedef struct
@@ -77,14 +78,18 @@ void setup() {
   Serial.println("LoRa Initializing OK!");
 }
 
-void sendData(String data_string)
+int sendData(String data_string)
 {
   if (WiFi.status())
     {
       HTTPClient http;
 
-      http.begin(DATA_RECEPTACLE)
+      http.begin(DATA_RECEPTACLE);
+      http.addHeader("Content-Type", "application/json");
+      return http.POST(data_string);
     }
+    Serial.print("NO WIFI");
+    return -1;
 }
 
 void loop() {
@@ -97,8 +102,10 @@ void loop() {
 
     // read packet
     while (LoRa.available()) {
-      String LoRaData = LoRa.readString();
+      //String LoRaData = LoRa.readString();
+      String LoRaData = "{\"temperature\":\"6.9\", \"humidity\":\"6.9\", \"pressure\":\"69\", \"nodeID\":\"testMothershipCode\"}";
       Serial.println(LoRaData); 
+      Serial.print(sendData(LoRaData));
     }
 
     // print RSSI of packet
@@ -106,6 +113,6 @@ void loop() {
     Serial.println(LoRa.packetRssi());
 
     //send data to be parsed and sent off
-    sendData(LoRaData);
+    //Serial.print(sendData(LoRaData));
   }
 }
