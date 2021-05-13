@@ -79,12 +79,7 @@ void setup() {
   Serial.println("LoRa Initializing OK!");
 }
 
-data_package parseData(String packet)
-{
-  
-}
-
-int sendData(data_package parsed_data)
+int sendData(String data_string)
 {
   if (WiFi.status())
     {
@@ -92,7 +87,7 @@ int sendData(data_package parsed_data)
 
       http.begin(DATA_RECEPTACLE);
       http.addHeader("Content-Type", "application/json");
-      return http.POST("{\"temperature\":\"" + parsed_data.temperature +"\", \"humidity\":\"" + parsed_data.humidity + "\", \"pressure\":\"" + parsed_data.pressure + "\", \"nodeID\":\"" + parsed_data.nodeID + "\"}");
+      return http.POST(data_string);
     }
     Serial.print("NO WIFI");
     return -1;
@@ -108,8 +103,8 @@ void loop() {
 
     // read packet
     while (LoRa.available()) {
-      //String LoRaData = LoRa.readString();
-      String LoRaData = "{\"temperature\":\"6.9\", \"humidity\":\"6.9\", \"pressure\":\"69\", \"nodeID\":\"testMothershipCode\"}";
+      String LoRaData = LoRa.readString();
+      //String LoRaData = "{\"temperature\":\"6.9\", \"humidity\":\"6.9\", \"pressure\":\"69\", \"nodeID\":\"testMothershipCode\"}";
       Serial.println(LoRaData); 
       Serial.print(sendData(LoRaData));
     }
@@ -119,6 +114,6 @@ void loop() {
     Serial.println(LoRa.packetRssi());
 
     //send data to be parsed and sent off
-    //Serial.print(sendData(parseData(LoRaData)));
+    //Serial.print(sendData(LoRaData));
   }
 }

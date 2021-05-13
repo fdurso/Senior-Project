@@ -80,7 +80,8 @@ void loop() {
   
   //Send LoRa packet to receiver
   LoRa.beginPacket();
-  LoRa.printf("%i: {%f, %f, %i}", NODE_ID, test.temperature, test.humidity, test.pressure);
+  //sending pre-parsed json hurts me but I don't have tiome to do it properly
+  LoRa.printf("{\"temperature\":\"%f\", \"humidity\":\"%f\", \"pressure\":\"%i\", \"nodeID\":\"%s\"}", test.temperature, test.humidity, test.pressure, NODE_ID);
   LoRa.endPacket();
 
   counter++;
