@@ -3,6 +3,8 @@
   More resources: https://randomnerdtutorials.com
 *********/
 
+#define NODE_ID 1
+
 #include <SPI.h>
 #include <LoRa.h>
 
@@ -46,9 +48,6 @@ void setup() {
   //setup LoRa transceiver module
   LoRa.setPins(ss, rst, dio0);
   
-  //replace the LoRa.begin(---E-) argument with your location's frequency 
-  //433E6 for Asia
-  //866E6 for Europe
   //915E6 for North America
   while (!(LoRa.begin(915E6))) {
     Serial.println(".");
@@ -81,7 +80,7 @@ void loop() {
   
   //Send LoRa packet to receiver
   LoRa.beginPacket();
-  LoRa.printf("{%f, %f, %i}", test.temperature, test.humidity, test.pressure);
+  LoRa.printf("%i: {%f, %f, %i}", NODE_ID, test.temperature, test.humidity, test.pressure);
   LoRa.endPacket();
 
   counter++;

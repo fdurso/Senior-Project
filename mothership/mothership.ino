@@ -18,6 +18,7 @@
 //defining struct to format data easily
 typedef struct
 {
+  int nodeID;
   float temperature;
   float humidity;
   int pressure;
@@ -78,7 +79,12 @@ void setup() {
   Serial.println("LoRa Initializing OK!");
 }
 
-int sendData(String data_string)
+data_package parseData(String packet)
+{
+  
+}
+
+int sendData(data_package parsed_data)
 {
   if (WiFi.status())
     {
@@ -86,7 +92,7 @@ int sendData(String data_string)
 
       http.begin(DATA_RECEPTACLE);
       http.addHeader("Content-Type", "application/json");
-      return http.POST(data_string);
+      return http.POST("{\"temperature\":\"" + parsed_data.temperature +"\", \"humidity\":\"" + parsed_data.humidity + "\", \"pressure\":\"" + parsed_data.pressure + "\", \"nodeID\":\"" + parsed_data.nodeID + "\"}");
     }
     Serial.print("NO WIFI");
     return -1;
@@ -113,6 +119,6 @@ void loop() {
     Serial.println(LoRa.packetRssi());
 
     //send data to be parsed and sent off
-    //Serial.print(sendData(LoRaData));
+    //Serial.print(sendData(parseData(LoRaData)));
   }
 }
